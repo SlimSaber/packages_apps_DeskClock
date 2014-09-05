@@ -468,6 +468,31 @@ public final class AlarmStateManager extends BroadcastReceiver {
     }
 
     /**
+     * This will set the alarm instance to the one minute late and update
+     * the application notifications and schedule any state changes that need
+     * to occur in the future.
+     *
+     * @param context application context
+     * @param instance to set state to
+     */
+    public static void setOneminutelate(Context context, AlarmInstance instance) {
+        AlarmService.stopAlarm(context, instance);
+        int snoozeMinutes = 1;
+
+        // Set alarm time to next minute.Update alarm state and new alarm time in db.
+        Calendar newAlarmTime = Calendar.getInstance();
+        newAlarmTime.add(Calendar.MINUTE, snoozeMinutes);
+        instance.setAlarmTime(newAlarmTime);
+        instance.mAlarmState = AlarmInstance.SNOOZE_STATE;
+        AlarmInstance.updateInstance(context.getContentResolver(), instance);
+        scheduleInstanceStateChange(context, instance.getAlarmTime(),
+                instance, AlarmInstance.FIRED_STATE);
+
+        // Instance time changed, so find next alarm that will fire and notify system
+        updateNextAlarm(context);
+    }
+
+    /**
      * This will set the alarm instance to the MISSED_STATE and update
      * the application notifications and schedule any state changes that need
      * to occur in the future.
@@ -761,6 +786,19 @@ public final class AlarmStateManager extends BroadcastReceiver {
                 if (!intent.hasCategory(ALARM_DISMISS_TAG) &&
                         !intent.hasCategory(ALARM_SNOOZE_TAG)) {
                     LogUtils.i("Ignoring old Intent");
+                    return;
+                }
+            }
+
+            // If the phone is busy, keep the alarm snoozing.When the call is ended,
+            // the new coming alarm or the alarm which wakes from sooze,will skip the codes here
+            // and continue show the alarm as normal.
+            if (context.getResources().getBoolean(R.bool.config_delayalarm)) {
+                TelephonyManager mTelephonyManager = (TelephonyManager) context
+                        .getSystemService(Context.TELEPHONY_SERVICE);
+                if ((mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE)
+                        && (alarmState == AlarmInstance.FIRED_STATE)) {
+                    snooze(context, intent, instance);
                     return;
                 }
             }
