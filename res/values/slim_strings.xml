@@ -65,4 +65,7 @@
     <!-- Warn Silent Alarm title -->
     <string name="warn_silent_alarm_title">Alarm volume is silent</string>
 
+    <!-- Ringtone selection default" -->
+    <string name="ringtone_default">"Default ringtone"</string>
+
 </resources>
