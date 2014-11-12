@@ -29,6 +29,7 @@ import android.os.Message;
 import android.os.Vibrator;
 
 import com.android.deskclock.LogUtils;
+import com.android.deskclock.MultiPlayer;
 import com.android.deskclock.R;
 import com.android.deskclock.provider.AlarmInstance;
 
@@ -54,7 +55,7 @@ public class AlarmKlaxon {
 
     private static boolean sStarted = false;
     private static AudioManager sAudioManager = null;
-    private static MediaPlayer sMediaPlayer = null;
+    private static MultiPlayer sMediaPlayer = null;
 
     private static int sCurrentVolume = INCREASING_VOLUME_START;
     private static int sAlarmVolumeSetting;
@@ -132,7 +133,7 @@ public class AlarmKlaxon {
             }
 
             // TODO: Reuse mMediaPlayer instead of creating a new one and/or use RingtoneManager.
-            sMediaPlayer = new MediaPlayer();
+            sMediaPlayer = new MultiPlayer(context);
             sMediaPlayer.setOnErrorListener(new OnErrorListener() {
                 @Override
                 public boolean onError(MediaPlayer mp, int what, int extra) {
@@ -178,7 +179,7 @@ public class AlarmKlaxon {
     }
 
     // Do the common stuff when starting the alarm.
-    private static void startAlarm(Context context, MediaPlayer player,
+    private static void startAlarm(Context context, MultiPlayer player,
             AlarmInstance instance) throws IOException {
         AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         // do not play alarms if stream volume is 0 (typically because ringer mode is silent).
@@ -196,7 +197,7 @@ public class AlarmKlaxon {
         }
     }
 
-    private static void setDataSourceFromResource(Context context, MediaPlayer player, int res)
+    private static void setDataSourceFromResource(Context context, MultiPlayer player, int res)
             throws IOException {
         AssetFileDescriptor afd = context.getResources().openRawResourceFd(res);
         if (afd != null) {

@@ -42,4 +42,11 @@
     <string name="action_summary_snooze">snooze alarm</string>
     <string name="action_summary_dismiss">dismiss alarm</string>
 
+    <!-- Alarm picker dialog title -->
+    <string name="alarm_picker_title">Choose alarm type</string>
+
+    <!-- Alarm types -->
+    <string name="alarm_type_ringtone">Ringtone</string>
+    <string name="alarm_type_random">Randomly</string>
+
 </resources>
