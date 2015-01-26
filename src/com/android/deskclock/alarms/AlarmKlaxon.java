@@ -131,6 +131,12 @@ public class AlarmKlaxon {
             } else if (!Utils.isRingToneUriValid(context, alarmNoise)) {
                 alarmNoise = RingtoneManager.getActualDefaultRingtoneUri(context,
                         RingtoneManager.TYPE_ALARM);
+
+                // Verify that the default Uri is actually valid, if not get system default
+                if (!Utils.isRingToneUriValid(context, alarmNoise)) {
+                    alarmNoise = Utils.getSystemDefaultAlarm(context);
+                }
+
             }
 
             sAudioManager = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
