@@ -312,7 +312,6 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
         result.mLabel = label;
         result.mRingtone = alert;
         result.mIncreasingVolume = increasingVolume;
-        result.mProfile = profile;
         return result;
     }
 
