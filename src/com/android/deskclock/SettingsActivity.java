@@ -17,7 +17,6 @@
 package com.android.deskclock;
 
 import android.app.ActionBar;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.hardware.Sensor;
@@ -48,8 +47,6 @@ import java.util.TimeZone;
 public class SettingsActivity extends PreferenceActivity
         implements Preference.OnPreferenceChangeListener {
 
-    public static final String KEY_SHOW_STATUS_BAR_ICON =
-            "show_status_bar_icon";
     public static final String KEY_ALARM_SNOOZE =
             "snooze_duration";
     public static final String KEY_VOLUME_BEHAVIOR =
@@ -77,7 +74,7 @@ public class SettingsActivity extends PreferenceActivity
 
     private static CharSequence[][] mTimezones;
     private long mTime;
-    private SwitchPreference mAlarmIcon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,10 +101,6 @@ public class SettingsActivity extends PreferenceActivity
         listPref.setEntries(mTimezones[1]);
         listPref.setSummary(listPref.getEntry());
         listPref.setOnPreferenceChangeListener(this);
-
-        mAlarmIcon = (SwitchPreference) findPreference(KEY_SHOW_STATUS_BAR_ICON);
-        mAlarmIcon.setChecked(Settings.System.getInt(getContentResolver(),
-                Settings.System.SHOW_ALARM_ICON, 1) == 1);
     }
 
     @Override
@@ -169,11 +162,6 @@ public class SettingsActivity extends PreferenceActivity
         } else if (KEY_SHAKE_ACTION.equals(pref.getKey())) {
             final ListPreference listPref = (ListPreference) pref;
             updateActionSummary(listPref, (String) newValue, R.string.shake_action_summary);
-        } else if (KEY_SHOW_STATUS_BAR_ICON.equals(pref.getKey())) {
-            // Check if any alarms are active. If yes and
-            // we allow showing the alarm icon, the icon will be shown.
-            Settings.System.putInt(getContentResolver(), Settings.System.SHOW_ALARM_ICON,
-                    (Boolean) newValue ? 1 : 0);
         }
         return true;
     }
@@ -260,9 +248,6 @@ public class SettingsActivity extends PreferenceActivity
                 listPref.setOnPreferenceChangeListener(this);
             }
         }
-
-        SwitchPreference hideStatusbarIcon = (SwitchPreference) findPreference(KEY_SHOW_STATUS_BAR_ICON);
-        hideStatusbarIcon.setOnPreferenceChangeListener(this);
 
         SnoozeLengthDialog snoozePref = (SnoozeLengthDialog) findPreference(KEY_ALARM_SNOOZE);
         snoozePref.setSummary();
