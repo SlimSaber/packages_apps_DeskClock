@@ -33,6 +33,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -79,6 +80,8 @@ public class AlarmActivity extends Activity implements View.OnClickListener, Vie
     private static final int ALARM_NO_ACTION = 0;
     private static final int ALARM_SNOOZE = 1;
     private static final int ALARM_DISMISS = 2;
+
+    private static final String PROP_BOOT_MODE = "ro.alarm_boot";
 
     private static final Interpolator PULSE_INTERPOLATOR =
             new PathInterpolator(0.4f, 0.0f, 0.2f, 1.0f);
@@ -254,8 +257,21 @@ public class AlarmActivity extends Activity implements View.OnClickListener, Vie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final long instanceId = AlarmInstance.getId(getIntent().getData());
-        mAlarmInstance = AlarmInstance.getInstance(getContentResolver(), instanceId);
+        Uri intentData = getIntent().getData();
+
+        boolean isAlarmBoot = getIntent().getBooleanExtra(PROP_BOOT_MODE, false);
+
+        LogUtils.i(LOGTAG, "AlarmBoot start alarm activity, "
+                + "alarm boot = " + isAlarmBoot + " | getIntent() " + getIntent());
+
+        if (isAlarmBoot) {
+            AlarmStateManager.setRtcPowerUp(this, isAlarmBoot);
+            mAlarmInstance = AlarmInstance.getClosestFiredAlarmInstance(getContentResolver());
+        } else if (intentData != null) {
+            long instanceId = AlarmInstance.getId(intentData);
+            mAlarmInstance = AlarmInstance.getInstance(this.getContentResolver(), instanceId);
+        }
+
         if (mAlarmInstance == null) {
             // The alarm got deleted before the activity got created, so just finish()
             LogUtils.e(LOGTAG, "Error displaying alarm for intent: %s", getIntent());
